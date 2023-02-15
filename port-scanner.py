@@ -15,7 +15,7 @@ def connection_scan(target_ip, target_port):
         conn_socket.send(b'Banner_query\r\n')
         print("[+] {}/tcp open".format(target_port))
 
-    except (OSError): # [!] kali linux is not catching the error
+    except OSError as e: # [!] kali linux is not catching the error
         print("[-] {}/tcp closed".format(target_port))
 
     finally:
@@ -28,7 +28,7 @@ def port_scan(target, port_num):
     try:
         target_ip = socket.gethostbyname(target)
         connection_scan(target_ip, int(port_num))
-    except (OSError):
+    except OSError:
         print("[^] Cannot resolve {}: Unknown host".format(target))
         return # Exit scan if IP is not resolved
 
