@@ -13,10 +13,10 @@ def connection_scan(target_ip, target_port):
     try:
         conn_socket.connect((target_ip, target_port))
         conn_socket.send(b'Banner_query\r\n')
-        print("[+] {}/tcp open".format(target_port))
+        print("     [+] {}/tcp open".format(target_port))
 
     except OSError as e: # [!] kali linux is not catching the error
-        print("[-] {}/tcp closed".format(target_port))
+        print("     [-] {}/tcp closed".format(target_port))
 
     finally:
         conn_socket.close() # Ensures the connection is closed
@@ -27,10 +27,22 @@ def port_scan(target, port_num):
     # It first attempts to solve the IP, then enumerate through the ports
     try:
         target_ip = socket.gethostbyname(target)
-        connection_scan(target_ip, int(port_num))
     except OSError:
         print("[^] Cannot resolve {}: Unknown host".format(target))
         return # Exit scan if IP is not resolved
+
+    try:
+        target_name = socket.gethostbyaddr(target_ip)
+    except OSError:
+        return
+        #print('[*] Scan Results for: {}'.format(target_ip))
+
+    t = threading.Thread(target=connection_scan, args=(target, int(port_num)))
+    t.start()
+
+
+
+
 
 
 def argument_parser():
@@ -52,7 +64,8 @@ if __name__ == '__main__':
 
         #search the list of ports in each host in the list of hosts
         for host in host_list:
-            print('\nScan Results for: {}'.format(host))
+            #print('\nScan Results for: {}'.format(host))
+            print('[*]\nScan Results for: {}'.format(host))
             #port scan in the host
             for port in port_list:
                 port_scan(host, port)
